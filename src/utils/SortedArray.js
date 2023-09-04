@@ -12,6 +12,24 @@ export function* bubbleSort(array) {
     }
 }
 
+export function* insertionSort(array) {
+    for (var i = 1; i < array.length; i++) {
+        // i only need to access 'current' once, even as its index changes
+        const current = access(array, i)
+        yield current
+        var below = access(array, i - 1)
+        yield below
+        var j = i
+        while (j > 0 && current.value[0] < below.value[0]) {
+            yield swap(array, j, --j, current.value[0], below.value[0])
+            if (j > 0) {
+                below = access(array, j - 1)
+                yield below
+            }
+        }
+    }
+}
+
 function access(array, i) {
     return {
         accesses: [i],
