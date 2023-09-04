@@ -43,7 +43,7 @@ function App() {
 
       if (delay < delta) {
         // skip n - 1 frames that exceed the delta
-        for (let i = 0; i <= delay / delta; i++) {
+        for (let i = 0; i <= delta / delay; i++) {
           currentIter = iterator.next()
         }
       } else {
@@ -90,18 +90,22 @@ function App() {
 
   return (
     <div className="App">
-      <input type="number" value={delay} disabled={/* TODO: use ref to stop disabling this*/ !done} onChange={(e) => {
+      <label for="delay">Delay (ms)</label>
+      <input type="number" name="delay" value={delay} disabled={/* TODO: use ref to stop disabling this*/ !done} onChange={(e) => {
         e.preventDefault()
         const targetDelay = e.currentTarget.value
         setDelay(targetDelay)
       }}/>
-      <input type="number" value={size} disabled={!done} onChange={(e) => {
+      <label for="count">Count</label>
+      <input type="number" name="count" value={size} disabled={!done} onChange={(e) => {
         e.preventDefault()
         const size = e.currentTarget.value
         setSize(size)
         setNumbers(generateArray(size))
       }}/>
+      <label for="Bubble">Bubble</label>
       <input type="radio" name="Bubble"/>
+      <label for="Bubble">Insertion</label>
       <input type="radio" name="Insertion"/>
       <BarGraph numbers={numbers} colorCodes={colorCodes}/>
       <input type="button" disabled={!done} onClick={() => sort()} value="Start"/> 
