@@ -25,9 +25,12 @@ function App() {
     BUBBLE: bubbleSort,
     INSERTION: insertionSort,
   }
+
   const isDone = useRef(true)
+  const delayRef = useRef(100)
+
   const [done, setDone] = useState(isDone.current)
-  const [delay, setDelay] = useState(100)
+  const [delay, setDelay] = useState(delayRef.current)
   const [size, setSize] = useState(20)
   const [numbers, setNumbers] = useState([])
   const [colorCodes, setColorCodes] = useState({})
@@ -44,10 +47,11 @@ function App() {
     const doYield = async () => {
       const endTime = new Date().getTime()
       const delta = Math.max(33, endTime - startTime) // magic number 33 for 30 frames per second
+      const capturedDelay = delayRef.current
 
-      if (delay < delta) {
+      if (capturedDelay < delta) {
         // skip n - 1 frames that exceed the delta
-        for (let i = 0; i <= delta / delay; i++) {
+        for (let i = 0; i <= delta / capturedDelay; i++) {
           currentIter = iterator.next()
         }
       } else {
@@ -58,6 +62,7 @@ function App() {
       if (isDone.current || currentIter.done) {
         isDone.current = true
         setColorCodes({})
+        setNumbers([...numbers])
         setDone(isDone.current)
         return
       }
@@ -77,7 +82,7 @@ function App() {
         ...writes,
       })
       setNumbers([...numbers])
-      await new Promise((resolve) => { timerId = setTimeout(resolve, delay) })
+      await new Promise((resolve) => { timerId = setTimeout(resolve, delayRef.current) })
       startTime = new Date().getTime()
       doYield()
     }
@@ -100,22 +105,27 @@ function App() {
 
   return (
     <div className="App">
-      <label for="delay">Delay (ms)</label>
-      <input type="number" name="delay" value={delay} disabled={/* TODO: use ref to stop disabling this*/ !done} onChange={(e) => {
+      <label htmlFor="delay">Delay (ms)</label>
+      <input type="number" name="delay" value={delay} onChange={(e) => {
         e.preventDefault()
         const targetDelay = e.currentTarget.value
         setDelay(targetDelay)
+      }}
+      onBlur={(e) => {
+        e.preventDefault()
+        const targetDelay = e.currentTarget.value
+        delayRef.current = targetDelay
       }}/>
-      <label for="count">Count</label>
+      <label htmlFor="count">Count</label>
       <input type="number" name="count" value={size} disabled={!done} onChange={(e) => {
         e.preventDefault()
         const size = e.currentTarget.value
         setSize(size)
         setNumbers(generateArray(size))
       }}/>
-      <label for="bubble">Bubble</label>
+      <label htmlFor="bubble">Bubble</label>
       <input type="radio" name="algo" value="bubble" defaultChecked={true} disabled={!done} onChange={(e) => selectAlgo(e, "BUBBLE")}/>
-      <label for="insertion">Insertion</label>
+      <label htmlFor="insertion">Insertion</label>
       <input type="radio" name="algo" value="insertion" disabled={!done} onChange={(e) => selectAlgo(e, "INSERTION")}/>
       <BarGraph numbers={numbers} colorCodes={colorCodes}/>
       <input type="button" disabled={!done} onClick={() => sort()} value="Start"/> 
