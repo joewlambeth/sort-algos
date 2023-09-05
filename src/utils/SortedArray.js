@@ -30,6 +30,27 @@ export function* insertionSort(array) {
     }
 }
 
+export function* selectionSort(array) {
+    for (var i = 0; i < array.length - 1; i++) {
+        const current = access(array, i)
+        yield current
+        var currentLowest = current
+        var currentLowestIndex = i
+        for (var j = i + 1; j < array.length; j++) {
+            const nextNumber = access(array, j);
+            yield nextNumber
+            if (currentLowest.value[0] > nextNumber.value[0]) {
+                currentLowest = nextNumber
+                currentLowestIndex = j
+            }
+        }
+
+        if (i !== currentLowestIndex) {
+            yield swap(array, i, currentLowestIndex, current.value[0], currentLowest.value[0])
+        }
+    }
+}
+
 function access(array, i) {
     return {
         accesses: [i],

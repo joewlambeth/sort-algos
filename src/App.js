@@ -1,7 +1,7 @@
 import './App.css';
 import React, { useEffect, useRef, useState } from 'react';
 import BarGraph from './components/BarGraph';
-import { bubbleSort, insertionSort } from './utils/SortedArray';
+import { bubbleSort, insertionSort, selectionSort } from './utils/SortedArray';
 
 function App() {
 
@@ -22,8 +22,18 @@ function App() {
   }
 
   const algoMapping = {
-    BUBBLE: bubbleSort,
-    INSERTION: insertionSort,
+    BUBBLE: {
+      label: "Bubble",
+      func: bubbleSort
+    },
+    INSERTION: {
+      label: "Insertion",
+      func: insertionSort,
+    },
+    SELECTION: {
+      label: "Selection",
+      func: selectionSort
+    }
   }
 
   const isDone = useRef(true)
@@ -34,13 +44,13 @@ function App() {
   const [size, setSize] = useState(20)
   const [numbers, setNumbers] = useState([])
   const [colorCodes, setColorCodes] = useState({})
-  const [algo, setAlgo] = useState("BUBBLE")
+  const [algo, setAlgo] = useState(algoMapping.BUBBLE)
 
   var timerId
   const sort = () => {
     isDone.current = false
     setDone(isDone.current)
-    const iterator = algoMapping[algo](numbers)
+    const iterator = algo.func(numbers)
 
     var currentIter
     var startTime = new Date().getTime()
@@ -106,7 +116,7 @@ function App() {
   return (
     <div className="App">
       <label htmlFor="delay">Delay (ms)</label>
-      <input type="number" name="delay" value={delay} onChange={(e) => {
+      <input type="number" name="delay" value={delay} min={Number.MIN_VALUE} onChange={(e) => {
         e.preventDefault()
         const targetDelay = e.currentTarget.value
         setDelay(targetDelay)
@@ -117,16 +127,19 @@ function App() {
         delayRef.current = targetDelay
       }}/>
       <label htmlFor="count">Count</label>
-      <input type="number" name="count" value={size} disabled={!done} onChange={(e) => {
+      <input type="number" name="count" value={size} min={2} disabled={!done} onChange={(e) => {
         e.preventDefault()
         const size = e.currentTarget.value
         setSize(size)
         setNumbers(generateArray(size))
       }}/>
-      <label htmlFor="bubble">Bubble</label>
-      <input type="radio" name="algo" value="bubble" defaultChecked={true} disabled={!done} onChange={(e) => selectAlgo(e, "BUBBLE")}/>
-      <label htmlFor="insertion">Insertion</label>
-      <input type="radio" name="algo" value="insertion" disabled={!done} onChange={(e) => selectAlgo(e, "INSERTION")}/>
+      {Object.keys(algoMapping).map((algo, i) => {
+        const algoLabel = algoMapping[algo].label
+        return <div key={algo}>
+                <label htmlFor={algoLabel}>{algoLabel}</label>
+                <input type="radio" name="algo" defaultChecked={i === 0} value={algoLabel} disabled={!done} onChange={(e) => selectAlgo(e, algoMapping[algo])}/>
+              </div>
+      })}
       <BarGraph numbers={numbers} colorCodes={colorCodes}/>
       <input type="button" disabled={!done} onClick={() => sort()} value="Start"/> 
       <input type="button" disabled={done} onClick={() => {
