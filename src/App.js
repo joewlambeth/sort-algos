@@ -1,7 +1,7 @@
 import './App.css';
 import React, { useEffect, useRef, useState } from 'react';
 import BarGraph from './components/BarGraph';
-import { bubbleSort, insertionSort, selectionSort } from './utils/SortedArray';
+import { bubbleSort, insertionSort, selectionSort, mergeSort } from './utils/SortedArray';
 
 function App() {
 
@@ -33,6 +33,10 @@ function App() {
     SELECTION: {
       label: "Selection",
       func: selectionSort
+    }, 
+    MERGE: {
+      label: "Merge",
+      func: mergeSort
     }
   }
 
@@ -87,13 +91,16 @@ function App() {
         return obj
       }, {}): {}
 
-      setColorCodes({
-        ...accesses,
-        ...writes,
-      })
-      setNumbers([...numbers])
-      await new Promise((resolve) => { timerId = setTimeout(resolve, delayRef.current) })
-      startTime = new Date().getTime()
+      // auxillary operations aren't rendered !
+      if (currentIter.value.value != null) {
+        setColorCodes({
+          ...accesses,
+          ...writes,
+        })
+        setNumbers([...numbers])
+        await new Promise((resolve) => { timerId = setTimeout(resolve, delayRef.current) })
+        startTime = new Date().getTime()
+      }
       doYield()
     }
 
